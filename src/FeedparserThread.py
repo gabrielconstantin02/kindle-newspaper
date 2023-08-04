@@ -22,36 +22,29 @@ class FeedparserThread(threading.Thread):
     Each one of these threads will get the task of opening one feed
     and process its entries.
 
-    Given an url, starting time and a global list, this thread will
-    add new posts to the global list, after processing.
+    Given an url, starting time, and a function to append new posts,
+    this thread will add new posts using the function, after processing.
 
     """
 
-    def __init__(self, url, START, posts):
+    def __init__(self, feed, START, append_posts_func):
         threading.Thread.__init__(self)
-        self.url = url
+        self.feed = feed
         self.START = START
-        self.posts = posts
-        self.myposts = []
+        self.append_posts_func = append_posts_func
 
     def run(self):
-        url = self.url
-        options = morss.Options(format='rss')
-        url, rss = morss.FeedFetch(url, options)
-        rss = morss.FeedGather(rss, url, options)
-        output = morss.FeedFormat(rss, options, 'unicode')
-        feed = feedparser.parse(output)
-        # feed = feedparser.parse(self.url)
         try:
-            blog = feed['feed']['title']
+            blog = self.feed['feed']['title']
         except KeyError:
             blog = "---"
-        for entry in feed['entries']:
+        myposts = []
+        for entry in self.feed['entries']:
             post = process_entry(entry, blog, self.START)
             if post:
-                self.myposts.append(post)
-        self.myposts.sort()
-        self.posts += self.myposts
+                myposts.append(post)
+        myposts.sort()
+        self.append_posts_func(myposts)
 
 
 def process_entry(entry, blog, START):

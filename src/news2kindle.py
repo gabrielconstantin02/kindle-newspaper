@@ -75,6 +75,13 @@ def get_posts_list(feed_list, START):
     """
     posts = []
     ths = []
+    lock = threading.Lock()
+
+    def append_posts(new_posts):
+        lock.acquire()
+        posts.extend(new_posts)
+        lock.release()
+
     for link in feed_list:
         url = str(link)
         options = morss.Options(format='rss')
@@ -82,7 +89,9 @@ def get_posts_list(feed_list, START):
         rss = morss.FeedGather(rss, url, options)
         output = morss.FeedFormat(rss, options, 'unicode')
         feed = feedparser.parse(output)
-        th = FeedparserThread(feed, START, posts)
+        logging.info("//////////////////////////////////////////")
+        logging.info(feed)
+        th = FeedparserThread(feed, START, append_posts)
         ths.append(th)
         th.start()
 

@@ -38,7 +38,7 @@ except ImportError:
     from urllib.parse import parse_qs, urljoin, urlparse
 
 
-MAX_ITEM = int(os.getenv('ITEM', 20)) # cache-only beyond
+MAX_ITEM = int(os.getenv('MAX_ITEM', 200)) # cache-only beyond
 MAX_TIME = int(os.getenv('MAX_TIME', 24)) # cache-only after (in sec)
 
 LIM_ITEM = int(os.getenv('ITEM', 20)) # deletes what's beyond
