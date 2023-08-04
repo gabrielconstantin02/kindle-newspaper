@@ -89,8 +89,6 @@ def get_posts_list(feed_list, START):
         rss = morss.FeedGather(rss, url, options)
         output = morss.FeedFormat(rss, options, 'unicode')
         feed = feedparser.parse(output)
-        logging.info("//////////////////////////////////////////")
-        logging.info(feed)
         th = FeedparserThread(feed, START, append_posts)
         ths.append(th)
         th.start()
@@ -213,7 +211,12 @@ def do_one_round():
         logging.info("Sending to kindle email")
         send_mail(send_from=EMAIL_FROM,
                   send_to=[KINDLE_EMAIL],
-                  subject="convert",
+                  subject="Daily news - "+str(today_date),
+                  text="This is your daily news.\n\n--\n\n",
+                  files=[mobiFile])
+        send_mail(send_from=EMAIL_FROM,
+                  send_to=["bhawnachandra.in@gmail.com"],
+                  subject="Daily news - "+str(today_date),
                   text="This is your daily news.\n\n--\n\n",
                   files=[mobiFile])
         logging.info("Cleaning up...")
