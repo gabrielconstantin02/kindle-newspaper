@@ -32,6 +32,8 @@ KINDLE_EMAIL = os.getenv("KINDLE_EMAIL")
 PANDOC = os.getenv("PANDOC_PATH", "/usr/bin/pandoc")
 PERIOD = int(os.getenv("UPDATE_PERIOD", 24))  # hours between RSS pulls
 FETCH_PERIOD=int(os.getenv("FETCH_PERIOD",24))
+HOUR=int(os.getenv("HOUR",0))
+MINUTE=int(os.getenv("MINUTES",0))
 
 CONFIG_PATH = '/config'
 FEED_FILE = os.path.join(CONFIG_PATH, 'feeds.txt')
@@ -161,6 +163,7 @@ def convert_to_mobi(input_file, output_file):
 def do_one_round():
     # get all posts from starting point to now
     now = pytz.utc.localize(datetime.now())
+    #midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
     start = get_start(feed_file)
 
     logging.info(f"Collecting posts since {start}")
@@ -178,10 +181,9 @@ def do_one_round():
                         for post in posts]) + html_tail
 
         logging.info("Creating epub")
-
-        epubFile = 'dailynews.epub'
-        mobiFile = 'dailynews.mobi'
-
+        today_date = datetime.today().date()
+        epubFile = str(today_date)+'.epub'
+        mobiFile = str(today_date)+'.mobi'
         os.environ['PYPANDOC_PANDOC'] = PANDOC
         pypandoc.convert_text(result,
                               to='epub3',
@@ -195,7 +197,7 @@ def do_one_round():
         logging.info("Sending to kindle email")
         send_mail(send_from=EMAIL_FROM,
                   send_to=[KINDLE_EMAIL],
-                  subject="Daily News",
+                  subject="convert",
                   text="This is your daily news.\n\n--\n\n",
                   files=[mobiFile])
         logging.info("Cleaning up...")
@@ -205,8 +207,16 @@ def do_one_round():
     logging.info("Finished.")
     update_start(now)
 
+def get_next_x_am():
+    now = pytz.utc.localize(datetime.utcnow())
+    next_x_am = now.replace(hour=HOUR, minute=MINUTE, second=0, microsecond=0)
+    if now >= next_x_am:
+        next_x_am += timedelta(days=1)
+    return (next_x_am - now).total_seconds()
 
 if __name__ == '__main__':
     while True:
         do_one_round()
-        time.sleep(PERIOD*60)
+        seconds = get_next_x_am()
+        # seconds = PERIOD*3600
+        time.sleep(seconds)

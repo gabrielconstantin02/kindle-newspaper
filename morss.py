@@ -38,11 +38,11 @@ except ImportError:
     from urllib.parse import parse_qs, urljoin, urlparse
 
 
-MAX_ITEM = int(os.getenv('MAX_ITEM', 5)) # cache-only beyond
+MAX_ITEM = int(os.getenv('ITEM', 20)) # cache-only beyond
 MAX_TIME = int(os.getenv('MAX_TIME', 24)) # cache-only after (in sec)
 
-LIM_ITEM = int(os.getenv('LIM_ITEM', 20)) # deletes what's beyond
-LIM_TIME = int(os.getenv('LIM_TIME', 2.5)) # deletes what's after
+LIM_ITEM = int(os.getenv('ITEM', 20)) # deletes what's beyond
+LIM_TIME = int(os.getenv('LIM_TIME', 24)) # deletes what's after
 
 DELAY = int(os.getenv('DELAY', 10 * 60)) # xml cache & ETag cache (in sec)
 TIMEOUT = int(os.getenv('TIMEOUT', 4)) # http timeout (in sec)
