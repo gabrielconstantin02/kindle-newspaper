@@ -19,6 +19,7 @@ import threading
 import subprocess
 from datetime import datetime, timedelta
 import os
+import feedparser
 from FeedparserThread import FeedparserThread
 
 logging.basicConfig(level=logging.INFO)
@@ -74,8 +75,14 @@ def get_posts_list(feed_list, START):
     """
     posts = []
     ths = []
-    for url in feed_list:
-        th = FeedparserThread(url, START, posts)
+    for link in feed_list:
+        url = str(link)
+        options = morss.Options(format='rss')
+        url, rss = morss.FeedFetch(url, options)
+        rss = morss.FeedGather(rss, url, options)
+        output = morss.FeedFormat(rss, options, 'unicode')
+        feed = feedparser.parse(output)
+        th = FeedparserThread(feed, START, posts)
         ths.append(th)
         th.start()
 
