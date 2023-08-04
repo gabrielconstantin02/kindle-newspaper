@@ -214,11 +214,6 @@ def do_one_round():
                   subject="Daily news - "+str(today_date),
                   text="This is your daily news.\n\n--\n\n",
                   files=[mobiFile])
-        send_mail(send_from=EMAIL_FROM,
-                  send_to=["bhawnachandra.in@gmail.com"],
-                  subject="Daily news - "+str(today_date),
-                  text="This is your daily news.\n\n--\n\n",
-                  files=[mobiFile])
         logging.info("Cleaning up...")
         os.remove(epubFile)
         os.remove(mobiFile)
