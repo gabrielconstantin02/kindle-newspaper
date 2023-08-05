@@ -13,6 +13,7 @@ import morss
 import sys
 import pypandoc
 import pytz
+from tzlocal import get_localzone
 import time
 import logging
 import threading
@@ -222,7 +223,9 @@ def do_one_round():
     update_start(now)
 
 def get_next_x_am():
-    now = pytz.utc.localize(datetime.utcnow())
+    tz = get_localzone()
+    timezone=pytz.timezone(tz.key)
+    now = datetime.now(tz=timezone)
     next_x_am = now.replace(hour=HOUR, minute=MINUTE, second=0, microsecond=0)
     if now >= next_x_am:
         next_x_am += timedelta(days=1)
